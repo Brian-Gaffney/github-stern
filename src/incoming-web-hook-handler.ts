@@ -3,6 +3,7 @@ import express from 'express'
 import {
 	markPullRequestAsUnmergeable,
 	markPullRequestAsMasterMerge,
+	markPullRequestAsMergeable,
 } from './github-api'
 
 export default (req: express.Request, res: express.Response) => {
@@ -21,6 +22,10 @@ export default (req: express.Request, res: express.Response) => {
 	// Check if the PR has merge conflicts
 	if (!mergeable && mergeableState === 'dirty') {
 		markPullRequestAsUnmergeable(pullRequestNumber)
+	}
+
+	if (mergeable && mergeableState === 'clean') {
+		markPullRequestAsMergeable(pullRequestNumber)
 	}
 
 	// Check if the PR is going into master
