@@ -4,6 +4,9 @@ locals {
 
 resource "google_storage_bucket" "bucket" {
   name = "github-stern"
+  uniform_bucket_level_access {
+    bucket_policy_only = true
+  }
 }
 
 data "archive_file" "function_archive" {
