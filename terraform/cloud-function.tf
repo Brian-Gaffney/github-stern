@@ -4,6 +4,9 @@ locals {
 
 resource "google_storage_bucket" "bucket" {
   name = "github-stern"
+  encryption {
+    default_kms_key_name = true
+  }
 }
 
 data "archive_file" "function_archive" {
