@@ -47,19 +47,16 @@ async function getPullRequest(pullRequestNumber: number) {
 }
 
 async function getPullRequests() {
-	const res: PullRequestsAPIResponse = await got(
-		`${githubApiRoot}/pulls`,
-		{
-			searchParams: {
-				state: 'open',
-			},
-			responseType: 'json',
-			headers: {
-				accept: 'application/vnd.github.v3+json',
-				authorization: `token ${token}`,
-			},
-		}
-	)
+	const res: PullRequestsAPIResponse = await got(`${githubApiRoot}/pulls`, {
+		searchParams: {
+			state: 'open',
+		},
+		responseType: 'json',
+		headers: {
+			accept: 'application/vnd.github.v3+json',
+			authorization: `token ${token}`,
+		},
+	})
 
 	return res.body
 }
@@ -99,18 +96,38 @@ async function markPullRequestAsMergeable(pullRequestNumber: number) {
 async function removeLabelFromPR(pullRequestNumber: number, label: string) {
 	console.info(`Removing label "${label}" from PR ${pullRequestNumber}`)
 
-	const requestRoute = encodeURI(`${githubApiRoot}/issues/${pullRequestNumber}/labels/${label}`)
-
-	const res: PullRequestAPIResponse = await got.delete(
-		requestRoute,
-		{
-			responseType: 'json',
-			headers: {
-				accept: 'application/vnd.github.v3+json',
-				authorization: `token ${token}`,
-			},
-		}
+	const requestRoute = encodeURI(
+		`${githubApiRoot}/issues/${pullRequestNumber}/labels/${label}`
 	)
+
+	const res: PullRequestAPIResponse = await got.delete(requestRoute, {
+		responseType: 'json',
+		headers: {
+			accept: 'application/vnd.github.v3+json',
+			authorization: `token ${token}`,
+		},
+	})
+
+	return res.body
+}
+
+async function addCommentToPR(pullRequestNumber: number, comment: string) {
+	console.info(`Adding comment to PR ${pullRequestNumber}`)
+
+	const requestRoute = encodeURI(
+		`${githubApiRoot}/issues/${pullRequestNumber}/comments`
+	)
+
+	const res: PullRequestAPIResponse = await got.post(requestRoute, {
+		json: {
+			body: `[BOT 🤖] ${comment}`,
+		},
+		responseType: 'json',
+		headers: {
+			accept: 'application/vnd.github.v3+json',
+			authorization: `token ${token}`,
+		},
+	})
 
 	return res.body
 }
@@ -121,4 +138,5 @@ export {
 	markPullRequestAsUnmergeable,
 	markPullRequestAsMasterMerge,
 	markPullRequestAsMergeable,
+	addCommentToPR,
 }
